@@ -59,6 +59,11 @@ function borealis_block_wrappers_admin_validate($form, &$form_state) {
  */
 function borealis_block_wrappers_preprocess_block(&$variables) {
 
+  // Display Suite has problems with this approach, semantics must be loaded.
+  if (!isset($variables['block']->semantics)) {
+    $variables['block']->semantics = borealis_sb_get_wrapper($variables['block']->module, $variables['block']->delta);
+  }
+
   // Add additional template suggestions for compatibilty with Semantic Blocks module.
   $markup = check_plain($variables['block']->semantics);
   $module = check_plain($variables['block']->module);
