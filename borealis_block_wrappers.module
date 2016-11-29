@@ -1,8 +1,11 @@
 <?php
+
 /**
  * @file
  * Code for the Borealis Block Wrappers module.
  */
+
+/* Hooks. */
 
 /**
  * Implements hook_module_implements_alter().
@@ -18,16 +21,16 @@ function borealis_block_wrappers_module_implements_alter(&$implementations, $hoo
 }
 
 /**
- * Implements hook_form_alter
+ * Implements hook_form_alter().
  */
 function borealis_block_wrappers_form_alter(&$form, &$form_state, $form_id) {
-  // Only want this showing up on Block Add and Configure pages
+  // Only want this showing up on Block Add and Configure pages.
   if ($form_id == 'block_admin_configure' || $form_id == 'block_add_block_form') {
     if (user_access('administer block semantics')) {
       $form['semantics']['wrapper']['#options']['zip'] = t('Default');
 
-      // switch out Borealis validation for our validation
-      if(($key = array_search('borealis_sb_admin_validate', $form['#validate'])) !== false) {
+      // Switch out Borealis validation for our validation.
+      if (($key = array_search('borealis_sb_admin_validate', $form['#validate'])) !== FALSE) {
         unset($form['#validate'][$key]);
       }
       $form['#validate'][] = 'borealis_block_wrappers_admin_validate';
@@ -35,8 +38,12 @@ function borealis_block_wrappers_form_alter(&$form, &$form_state, $form_id) {
   }
 }
 
+/* Form handlers. */
+
 /**
- * Custom Block Validation
+ * Form validation handler for block_admin_configure and block_add_block_form.
+ *
+ * @see borealis_block_wrappers_form_alter()
  */
 function borealis_block_wrappers_admin_validate($form, &$form_state) {
   $wrapper_value = $form_state['complete form']['semantics']['wrapper']['#value'];
@@ -54,17 +61,19 @@ function borealis_block_wrappers_admin_validate($form, &$form_state) {
   }
 }
 
+/* Theme functions. */
+
 /**
- * Implements hook_preprocess_HOOK() for block templates.
+ * Implements hook_preprocess_HOOK() for block.tpl.php.
  */
 function borealis_block_wrappers_preprocess_block(&$variables) {
-
   // Display Suite has problems with this approach, semantics must be loaded.
   if (!isset($variables['block']->semantics)) {
     $variables['block']->semantics = borealis_sb_get_wrapper($variables['block']->module, $variables['block']->delta);
   }
 
-  // Add additional template suggestions for compatibilty with Semantic Blocks module.
+  // Add additional template suggestions for compatibilty with Semantic Blocks
+  // module.
   $markup = check_plain($variables['block']->semantics);
   $module = check_plain($variables['block']->module);
   $delta = strtr($variables['block']->delta, '-', '_');
